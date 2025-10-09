@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"text/template"
 
 	"twitbox.vedantkugaonkar.net/internal/model"
 )
@@ -14,30 +15,30 @@ func (app *application) home(w http.ResponseWriter, req *http.Request) {
 		http.NotFound(w, req)
 		return
 	}
-	// files := []string{
-	// 	"ui/html/base.tmpl.html",
-	// 	"ui/html/pages/home.tmpl.html",
-	// 	"ui/html/partials.tmpl.html",
-	// }
+	files := []string{
+		"ui/html/base.tmpl.html",
+		"ui/html/pages/home.tmpl.html",
+		"ui/html/partials.tmpl.html",
+	}
 
-	// fs, err := template.ParseFiles(files...)
-	// if err != nil {
-	// 	app.serverError(w, err)
-	// 	return
-	// }
-	// err = fs.ExecuteTemplate(w, "base", nil)
-	// if err != nil {
-	// 	app.serverError(w, err)
-	// 	return
-	twits, err := app.twits.Latest()
+	fs, err := template.ParseFiles(files...)
 	if err != nil {
 		app.serverError(w, err)
 		return
 	}
-	for _, twit := range twits {
-		fmt.Fprintf(w, "%+v\n", twit)
+	err = fs.ExecuteTemplate(w, "base", nil)
+	if err != nil {
+		app.serverError(w, err)
+		return
+		// twits, err := app.twits.Latest()
+		// if err != nil {
+		// 	app.serverError(w, err)
+		// 	return
+		// }
+		// for _, twit := range twits {
+		// 	fmt.Fprintf(w, "%+v\n", twit)
+		// }
 	}
-
 }
 func (app *application) twitCreate(w http.ResponseWriter, req *http.Request) {
 	if req.Method != http.MethodPost {

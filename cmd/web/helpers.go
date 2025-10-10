@@ -24,3 +24,16 @@ func (app *application) clientError(w http.ResponseWriter, status int) {
 func (app *application) notFound(w http.ResponseWriter) {
 	app.clientError(w, http.StatusNotFound)
 }
+func (app *application) renderer(w http.ResponseWriter, page string, status int, data *templateData) {
+	ts, ok := app.tempCache[page]
+	if !ok {
+		err := fmt.Errorf("template for %s not available", page)
+		app.serverError(w, err)
+		return
+	}
+	w.WriteHeader(status)
+	err := ts.ExecuteTemplate(w, "base", data)
+	if err != nil {
+		app.serverError(w, err)
+	}
+}

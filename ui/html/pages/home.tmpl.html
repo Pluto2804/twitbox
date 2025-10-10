@@ -1,4 +1,22 @@
 {{define "title"}}Home{{end}}
-{{ define "main"}}<h2>Latest Twits</h2>
-<p>There is nothing to see here yet!</p>
+{{define "main"}}
+<h2>Latest Twits</h2>
+{{if .Twits}}
+<table>
+    <tr>
+        <th>Title</th>
+        <th>Created</th>
+        <th>Id</th>
+    </tr>
+    {{range .Twits}}
+    <tr>
+        <td><a href='/twit/view?id={{.Id}}'>{{.Title}}</a></td>
+        <td>{{.Created}}</td>
+        <td>#{{.Id}}</td>
+    </tr>
+    {{end}}
+</table>
+{{else}}
+<p>There is nothing to see here....yet!</p>
+{{end}}
 {{end}}

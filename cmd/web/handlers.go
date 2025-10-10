@@ -5,39 +5,25 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-	"text/template"
 
 	"twitbox.vedantkugaonkar.net/internal/model"
 )
 
 func (app *application) home(w http.ResponseWriter, req *http.Request) {
-	// if req.URL.Path != "/" {
-	// 	http.NotFound(w, req)
-	// 	return
-	// }
-	// files := []string{
-	// 	"ui/html/base.tmpl.html",
-	// 	"ui/html/pages/home.tmpl.html",
-	// 	"ui/html/partials.tmpl.html",
-	// }
+	if req.URL.Path != "/" {
+		http.NotFound(w, req)
+		return
+	}
 
-	// fs, err := template.ParseFiles(files...)
-	// if err != nil {
-	// 	app.serverError(w, err)
-	// 	return
-	// }
-	// err = fs.ExecuteTemplate(w, "base", nil)
-	// if err != nil {
-	// 	app.serverError(w, err)
-	// 	return
 	twits, err := app.twits.Latest()
 	if err != nil {
 		app.serverError(w, err)
 		return
 	}
-	for _, twit := range twits {
-		fmt.Fprintf(w, "%+v\n", twit)
+	data := &templateData{
+		Twits: twits,
 	}
+	app.renderer(w, "home.tmpl.html", http.StatusOK, data)
 }
 
 func (app *application) twitCreate(w http.ResponseWriter, req *http.Request) {
@@ -47,8 +33,8 @@ func (app *application) twitCreate(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	title := "O snail6"
-	content := "O snail\nClimb mount Kailasa,\nBut slowly,slowly!\n\n- Kobayashiki Issao"
+	title := "O shell6"
+	content := "O snail\nfly through mount Himaparva,\nBut slowly,slowly!\n\n- Koba sao"
 	expires := 7
 	id, err := app.twits.Insert(title, content, expires)
 	if err != nil {
@@ -73,19 +59,8 @@ func (app *application) twitView(w http.ResponseWriter, req *http.Request) {
 		}
 		return
 	}
-	files := []string{
-		"ui/html/base.tmpl.html",
-		"ui/html/partials.tmpl.html",
-		"ui/html/pages/view.tmpl.html",
-	}
-	ts, err := template.ParseFiles(files...)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
-	err = ts.ExecuteTemplate(w, "base", twit)
-	if err != nil {
-		app.serverError(w, err)
-	}
+
+	data := &templateData{Twit: twit}
+	app.renderer(w, "view.tmpl.html", http.StatusOK, data)
 
 }

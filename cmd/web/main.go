@@ -6,15 +6,17 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"text/template"
 
 	_ "github.com/go-sql-driver/mysql"
 	"twitbox.vedantkugaonkar.net/internal/model"
 )
 
 type application struct {
-	infoLog  *log.Logger
-	errorLog *log.Logger
-	twits    *model.TwitModel
+	infoLog   *log.Logger
+	errorLog  *log.Logger
+	twits     *model.TwitModel
+	tempCache map[string]*template.Template
 }
 
 func openDB(dsn string) (*sql.DB, error) {
@@ -44,11 +46,15 @@ func main() {
 
 	//imp to defer the db before main finishes
 	defer db.Close()
-
+	tempCache, err := newTemplateCache()
+	if err != nil {
+		errorLog.Fatal(err)
+	}
 	ap := &application{
-		errorLog: errorLog,
-		infoLog:  infoLog,
-		twits:    &model.TwitModel{DB: db},
+		errorLog:  errorLog,
+		infoLog:   infoLog,
+		twits:     &model.TwitModel{DB: db},
+		tempCache: tempCache,
 	}
 
 	srv := http.Server{

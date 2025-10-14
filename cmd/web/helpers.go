@@ -1,9 +1,11 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"net/http"
 	"runtime/debug"
+	"time"
 )
 
 // sends 500 internal server error response to the user
@@ -31,9 +33,19 @@ func (app *application) renderer(w http.ResponseWriter, page string, status int,
 		app.serverError(w, err)
 		return
 	}
-	w.WriteHeader(status)
-	err := ts.ExecuteTemplate(w, "base", data)
+	buf := new(bytes.Buffer)
+	err := ts.ExecuteTemplate(buf, "base", data)
 	if err != nil {
 		app.serverError(w, err)
+		return
 	}
+	w.WriteHeader(status)
+	buf.WriteTo(w)
+
+}
+func (app *application) newTemplateData(req *http.Request) *templateData {
+	return &templateData{
+		CurrentYear: time.Now().Year(),
+	}
+
 }

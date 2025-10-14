@@ -2,7 +2,7 @@ package main
 
 import "net/http"
 
-func (app *application) routeMux() *http.ServeMux {
+func (app *application) routeMux() http.Handler {
 
 	mux := http.NewServeMux()
 	fileServer := http.FileServer(http.Dir("./ui/static/"))
@@ -10,5 +10,5 @@ func (app *application) routeMux() *http.ServeMux {
 	mux.HandleFunc("/", app.home)
 	mux.HandleFunc("/twit/create", app.twitCreate)
 	mux.HandleFunc("/twit/view", app.twitView)
-	return mux
+	return app.logRequest(secureHeaders(mux))
 }

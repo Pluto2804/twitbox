@@ -3,6 +3,8 @@ package model
 import (
 	"database/sql"
 	"errors"
+	"log"
+	"os"
 	"time"
 )
 
@@ -27,7 +29,11 @@ func (tm *TwitModel) Insert(title string, content string, expires int) (int, err
 	//LastInsertId() method on the result to get the ID of our
 	//newly inserted record in twits table
 	id, err := result.LastInsertId()
-	return int(id), err
+	if err != nil {
+		log.Fatalf("Something went wrong!-%s", err)
+		os.Exit(-1)
+	}
+	return int(id), nil
 }
 func (tm *TwitModel) Get(id int) (*Twit, error) {
 	stmt := `SELECT id,title,content,created,expires FROM twits 
@@ -42,7 +48,7 @@ func (tm *TwitModel) Get(id int) (*Twit, error) {
 			return nil, err
 		}
 	}
-	return s, err
+	return s, nil
 }
 func (tm *TwitModel) Latest() ([]*Twit, error) {
 	stmt := `SELECT id,title,content,created,expires FROM twits 

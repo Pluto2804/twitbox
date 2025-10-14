@@ -20,9 +20,8 @@ func (app *application) home(w http.ResponseWriter, req *http.Request) {
 		app.serverError(w, err)
 		return
 	}
-	data := &templateData{
-		Twits: twits,
-	}
+	data := app.newTemplateData(req)
+	data.Twits = twits
 	app.renderer(w, "home.tmpl.html", http.StatusOK, data)
 }
 
@@ -60,7 +59,8 @@ func (app *application) twitView(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	data := &templateData{Twit: twit}
+	data := app.newTemplateData(req)
+	data.Twit = twit
 	app.renderer(w, "view.tmpl.html", http.StatusOK, data)
 
 }

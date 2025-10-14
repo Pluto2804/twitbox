@@ -57,7 +57,7 @@ func main() {
 		tempCache: tempCache,
 	}
 
-	srv := http.Server{
+	srv := &http.Server{
 		Addr:     *addr,
 		ErrorLog: errorLog,
 		//calling the ap.routeMux() to get the servemux containing our routes

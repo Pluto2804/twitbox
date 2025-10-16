@@ -10,7 +10,7 @@
     </tr>
     {{range .Twits}}
     <tr>
-        <td><a href='/twit/view?id={{.Id}}'>{{.Title}}</a></td>
+        <td><a href='/twit/view/{{.Id}}'>{{.Title}}</a></td>
         <td>{{humanDate .Created}}</td>
         <td>#{{.Id}}</td>
     </tr>

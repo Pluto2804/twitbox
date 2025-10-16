@@ -49,3 +49,13 @@ func (app *application) newTemplateData(req *http.Request) *templateData {
 	}
 
 }
+func (app *application) routerWrap() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		app.notFound(w)
+	})
+}
+func (app *application) routerWrapA() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+	})
+}

@@ -16,6 +16,7 @@ type templateData struct {
 	CurrentYear int
 	Twit        *model.Twit
 	Twits       []*model.Twit
+	Form        any
 }
 
 func newTemplateCache() (map[string]*template.Template, error) {

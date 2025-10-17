@@ -12,6 +12,13 @@ import (
 	"twitbox.vedantkugaonkar.net/internal/model"
 )
 
+type snippetCreateForm struct {
+	Title       string
+	Content     string
+	Expires     int
+	FieldErrors map[string]string
+}
+
 func (app *application) home(w http.ResponseWriter, req *http.Request) {
 	twits, err := app.twits.Latest()
 	if err != nil {
@@ -49,6 +56,9 @@ func (app *application) twitView(w http.ResponseWriter, req *http.Request) {
 }
 func (app *application) twitCreate(w http.ResponseWriter, req *http.Request) {
 	data := &templateData{}
+	data.Form = &snippetCreateForm{
+		Expires: 365,
+	}
 	app.renderer(w, "create.tmpl.html", http.StatusCreated, data)
 
 }
@@ -62,23 +72,33 @@ func (app *application) twitCreatePost(w http.ResponseWriter, req *http.Request)
 	content := req.PostForm.Get("Content")
 
 	expires, err := strconv.Atoi(req.PostForm.Get("Expires"))
-	//map to hold any validation errors
-	fieldErrors := make(map[string]string)
+	//instance of snippetCreateForm struct containing the values from the form
+	//along with empty map initialised for any validation errors
+
+	scF := &snippetCreateForm{
+		Title:       title,
+		Content:     content,
+		Expires:     expires,
+		FieldErrors: map[string]string{},
+	}
+
 	if strings.TrimSpace(title) == "" {
-		fieldErrors["title"] = "This field cannot be empty!"
+		scF.FieldErrors["title"] = "This field cannot be empty!"
 	} else if utf8.RuneCountInString(title) > 100 {
-		fieldErrors["title"] = "This field cannot be more than 100 characters"
+		scF.FieldErrors["title"] = "This field cannot be more than 100 characters"
 	}
 
 	if strings.TrimSpace(content) == "" {
-		fieldErrors["content"] = "This field cannot be displayed!"
+		scF.FieldErrors["content"] = "This field cannot be displayed!"
 	}
 
-	if expires != 1 || expires != 7 || expires != 365 {
-		fieldErrors["expires"] = "This field must equal 1,7 or 365!"
+	if expires != 1 && expires != 7 && expires != 365 {
+		scF.FieldErrors["expires"] = "This field must equal 1,7 or 365!"
 	}
-	if len(fieldErrors) > 0 {
-		fmt.Fprintln(w, fieldErrors)
+	if len(scF.FieldErrors) > 0 {
+		data := app.newTemplateData(req)
+		data.Form = scF
+		app.renderer(w, "create.tmpl.html", http.StatusUnprocessableEntity, data)
 		return
 	}
 
@@ -86,7 +106,7 @@ func (app *application) twitCreatePost(w http.ResponseWriter, req *http.Request)
 		app.clientError(w, http.StatusBadRequest)
 		return
 	}
-	id, err := app.twits.Insert(title, content, expires)
+	id, err := app.twits.Insert(scF.Title, scF.Content, scF.Expires)
 	if err != nil {
 		app.serverError(w, err)
 		return

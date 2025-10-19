@@ -5,6 +5,15 @@ import (
 	"net/http"
 )
 
+/*
+Middleware basically is a function that is called at the beginning of a handler.
+The difference is it outputs a request and middleware can be chained.
+It would be incredibly cumbersome and inefficient to implement the same functions for every single endpoint, especially when you have a lot of them.
+It’s just a function that processes request so your handler can focus on one thing: handling the request after it’s already been processed.
+You don’t need to check if the request is authenticated because your authentication middleware has already done that.
+Middleware gives you the ability to begin your handler already operating with certain assumptions in place.
+If you have 10 different middleware functions, it’s certainly not DRY-compliant to write those same 10 function calls at the beginning of every handler. You could, but why would you want to?
+*/
 func secureHeaders(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		w.Header().Set("Content-Security-Policy", "default-src 'self' font.googleapis.com; font-src fonts.gstatic.com")

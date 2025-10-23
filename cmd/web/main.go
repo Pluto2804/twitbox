@@ -8,15 +8,17 @@ import (
 	"os"
 	"text/template"
 
+	"github.com/go-playground/form/v4"
 	_ "github.com/go-sql-driver/mysql"
 	"twitbox.vedantkugaonkar.net/internal/model"
 )
 
 type application struct {
-	infoLog   *log.Logger
-	errorLog  *log.Logger
-	twits     *model.TwitModel
-	tempCache map[string]*template.Template
+	infoLog     *log.Logger
+	errorLog    *log.Logger
+	twits       *model.TwitModel
+	tempCache   map[string]*template.Template
+	formDecoder *form.Decoder
 }
 
 func openDB(dsn string) (*sql.DB, error) {
@@ -50,11 +52,13 @@ func main() {
 	if err != nil {
 		errorLog.Fatal(err)
 	}
+	formDecoder := form.NewDecoder()
 	ap := &application{
-		errorLog:  errorLog,
-		infoLog:   infoLog,
-		twits:     &model.TwitModel{DB: db},
-		tempCache: tempCache,
+		errorLog:    errorLog,
+		infoLog:     infoLog,
+		twits:       &model.TwitModel{DB: db},
+		tempCache:   tempCache,
+		formDecoder: formDecoder,
 	}
 
 	srv := &http.Server{

@@ -2,10 +2,13 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"net/http"
 	"runtime/debug"
 	"time"
+
+	"github.com/go-playground/form/v4"
 )
 
 // sends 500 internal server error response to the user
@@ -58,4 +61,21 @@ func (app *application) routerWrapA() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 	})
+}
+func (app *application) decodePostForm(req *http.Request, dst any) error {
+	err := req.ParseForm()
+	if err != nil {
+		return err
+	}
+	err = app.formDecoder.Decode(dst, req.PostForm)
+
+	if err != nil {
+		var invalidDecoderError *form.InvalidEncodeError
+
+		if errors.As(err, invalidDecoderError) {
+			panic(err)
+		}
+		return err
+	}
+	return nil
 }

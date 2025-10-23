@@ -5,18 +5,17 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-	"strings"
-	"unicode/utf8"
 
 	"github.com/julienschmidt/httprouter"
 	"twitbox.vedantkugaonkar.net/internal/model"
+	"twitbox.vedantkugaonkar.net/internal/validator"
 )
 
 type snippetCreateForm struct {
-	Title       string
-	Content     string
-	Expires     int
-	FieldErrors map[string]string
+	Title               string `form:"title"`
+	Content             string `form:"content"`
+	Expires             int    `form:"expires"`
+	validator.Validator `form:"-"`
 }
 
 func (app *application) home(w http.ResponseWriter, req *http.Request) {
@@ -30,7 +29,7 @@ func (app *application) home(w http.ResponseWriter, req *http.Request) {
 	app.renderer(w, "home.tmpl.html", http.StatusOK, data)
 }
 func (app *application) twitView(w http.ResponseWriter, req *http.Request) {
-	//when httprouter parses a req, any named parameter are stored in the
+	//when httprouter parses a req, any named parameters are stored in the
 	//req context so here ParseFromContext is used to retrieve/get the id
 	params := httprouter.ParamsFromContext(req.Context())
 	//ByName can then be used to get the actual value
@@ -63,39 +62,18 @@ func (app *application) twitCreate(w http.ResponseWriter, req *http.Request) {
 
 }
 func (app *application) twitCreatePost(w http.ResponseWriter, req *http.Request) {
-	err := req.ParseForm()
+	var scF snippetCreateForm
+	err := app.decodePostForm(req, &scF)
 	if err != nil {
 		app.clientError(w, http.StatusBadRequest)
 		return
 	}
-	title := req.PostForm.Get("title")
-	content := req.PostForm.Get("Content")
 
-	expires, err := strconv.Atoi(req.PostForm.Get("Expires"))
-	//instance of snippetCreateForm struct containing the values from the form
-	//along with empty map initialised for any validation errors
-
-	scF := &snippetCreateForm{
-		Title:       title,
-		Content:     content,
-		Expires:     expires,
-		FieldErrors: map[string]string{},
-	}
-
-	if strings.TrimSpace(title) == "" {
-		scF.FieldErrors["title"] = "This field cannot be empty!"
-	} else if utf8.RuneCountInString(title) > 100 {
-		scF.FieldErrors["title"] = "This field cannot be more than 100 characters"
-	}
-
-	if strings.TrimSpace(content) == "" {
-		scF.FieldErrors["content"] = "This field cannot be displayed!"
-	}
-
-	if expires != 1 && expires != 7 && expires != 365 {
-		scF.FieldErrors["expires"] = "This field must equal 1,7 or 365!"
-	}
-	if len(scF.FieldErrors) > 0 {
+	scF.CheckField(validator.NotBlank(scF.Title), "title", "This field cannot be blank!")
+	scF.CheckField(validator.MaxChars(scF.Title, 100), "title", "This field cannot be more than 100 characters")
+	scF.CheckField(validator.PermittedInt(scF.Expires, 1, 7, 365), "expires", "This field must include 1,7 or 365")
+	scF.CheckField(validator.NotBlank(scF.Content), "content", "This field cannot be empty!")
+	if !scF.Valid() {
 		data := app.newTemplateData(req)
 		data.Form = scF
 		app.renderer(w, "create.tmpl.html", http.StatusUnprocessableEntity, data)

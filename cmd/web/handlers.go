@@ -50,6 +50,7 @@ func (app *application) twitView(w http.ResponseWriter, req *http.Request) {
 
 	data := app.newTemplateData(req)
 	data.Twit = twit
+
 	app.renderer(w, "view.tmpl.html", http.StatusOK, data)
 
 }
@@ -89,6 +90,7 @@ func (app *application) twitCreatePost(w http.ResponseWriter, req *http.Request)
 		app.serverError(w, err)
 		return
 	}
+	app.sessionManager.Put(req.Context(), "flash", "Snippet successfully created!")
 	//redirecting user to the relevant page for the twit
 	http.Redirect(w, req, fmt.Sprintf("/twit/view/%d", id), http.StatusSeeOther)
 }

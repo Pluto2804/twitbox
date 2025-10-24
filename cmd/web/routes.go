@@ -15,11 +15,13 @@ func (app *application) routeMux() http.Handler {
 
 	fileServer := http.FileServer(http.Dir("./ui/static/"))
 	router.Handler(http.MethodGet, "/static/*filepath", http.StripPrefix("/static", fileServer))
+
+	dynamic := alice.New(app.sessionManager.LoadAndSave)
 	//handlers
-	router.HandlerFunc(http.MethodGet, "/", app.home)
-	router.HandlerFunc(http.MethodPost, "/twit/create", app.twitCreatePost)
-	router.HandlerFunc(http.MethodGet, "/twit/view/:id", app.twitView)
-	router.HandlerFunc(http.MethodGet, "/twit/create", app.twitCreate)
+	router.Handler(http.MethodGet, "/", dynamic.ThenFunc(app.home))
+	router.Handler(http.MethodPost, "/twit/create", dynamic.ThenFunc(app.twitCreatePost))
+	router.Handler(http.MethodGet, "/twit/view/:id", dynamic.ThenFunc(app.twitView))
+	router.Handler(http.MethodGet, "/twit/create", dynamic.ThenFunc(app.twitCreate))
 
 	//chaining of middleware
 	standard := alice.New(app.recoverPanic, app.logRequest, secureHeaders)

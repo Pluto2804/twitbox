@@ -14,16 +14,16 @@
         {{with .Form.FieldErrors.content}}
              <label class="error">{{.}}</label>
         {{end}}     
-        <textarea name="Content">{{.Form.Content}}</textarea>
+        <textarea name="content">{{.Form.Content}}</textarea>
     </div>
     <div>
         {{with .Form.FieldErrors.Expires}}
              <label class="error">{{.}}</label>
          {{end}}    
         <label>Delete in:</label>
-        <input type="radio" name="Expires" value="365" {{if (eq .Form.Expires 365)}}checked{{end}}> One Year 
-        <input type="radio" name="Expires" value="7" {{if (eq .Form.Expires 7)}}checked{{end}}> One Week
-        <input type="radio" name="Expires" value="1" {{if (eq .Form.Expires 1)}}checked{{end}}> One Day
+        <input type="radio" name="expires" value="365" {{if (eq .Form.Expires 365)}}checked{{end}}> One Year 
+        <input type="radio" name="expires" value="7" {{if (eq .Form.Expires 7)}}checked{{end}}> One Week
+        <input type="radio" name="expires" value="1" {{if (eq .Form.Expires 1)}}checked{{end}}> One Day
     </div>
     <div>
         <input type="submit" value="Publish Twit">

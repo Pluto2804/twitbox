@@ -49,6 +49,7 @@ func (app *application) renderer(w http.ResponseWriter, page string, status int,
 func (app *application) newTemplateData(req *http.Request) *templateData {
 	return &templateData{
 		CurrentYear: time.Now().Year(),
+		Flash:       app.sessionManager.PopString(req.Context(), "flash"),
 	}
 
 }

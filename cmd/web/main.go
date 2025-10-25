@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"database/sql"
 	"flag"
 	"log"
@@ -61,6 +62,11 @@ func main() {
 	sessionManager := scs.New()
 	sessionManager.Store = mysqlstore.New(db)
 	sessionManager.Lifetime = 12 * time.Hour
+	sessionManager.Cookie.Secure = true
+
+	tlsConfig := &tls.Config{
+		CurvePreferences: []tls.CurveID{tls.X25519, tls.CurveP256},
+	}
 
 	ap := &application{
 		errorLog:       errorLog,
@@ -75,11 +81,15 @@ func main() {
 		Addr:     *addr,
 		ErrorLog: errorLog,
 		//calling the ap.routeMux() to get the servemux containing our routes
-		Handler: ap.routeMux(),
+		Handler:      ap.routeMux(),
+		TLSConfig:    tlsConfig,
+		IdleTimeout:  time.Minute,
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 10 * time.Second,
 	}
 
 	infoLog.Printf("Starting a server on %s", *addr)
-	err = srv.ListenAndServe()
+	err = srv.ListenAndServeTLS("tls/cert.pem", "tls/key.pem")
 	errorLog.Fatal(err)
 
 }

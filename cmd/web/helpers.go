@@ -36,6 +36,9 @@ func (app *application) renderer(w http.ResponseWriter, page string, status int,
 		app.serverError(w, err)
 		return
 	}
+	if data == nil {
+		data = app.newTemplateData(nil)
+	}
 	buf := new(bytes.Buffer)
 	err := ts.ExecuteTemplate(buf, "base", data)
 	if err != nil {
@@ -48,8 +51,9 @@ func (app *application) renderer(w http.ResponseWriter, page string, status int,
 }
 func (app *application) newTemplateData(req *http.Request) *templateData {
 	return &templateData{
-		CurrentYear: time.Now().Year(),
-		Flash:       app.sessionManager.PopString(req.Context(), "flash"),
+		CurrentYear:     time.Now().Year(),
+		Flash:           app.sessionManager.PopString(req.Context(), "flash"),
+		IsAuthenticated: app.isAuthenticated(req),
 	}
 
 }
@@ -73,10 +77,13 @@ func (app *application) decodePostForm(req *http.Request, dst any) error {
 	if err != nil {
 		var invalidDecoderError *form.InvalidEncodeError
 
-		if errors.As(err, invalidDecoderError) {
+		if errors.As(err, &invalidDecoderError) {
 			panic(err)
 		}
 		return err
 	}
 	return nil
+}
+func (app *application) isAuthenticated(req *http.Request) bool {
+	return app.sessionManager.Exists(req.Context(), "authenticatedUserId")
 }

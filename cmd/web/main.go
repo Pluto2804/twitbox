@@ -25,6 +25,7 @@ type application struct {
 	tempCache      map[string]*template.Template
 	formDecoder    *form.Decoder
 	sessionManager *scs.SessionManager
+	users          *model.UserModel
 }
 
 func openDB(dsn string) (*sql.DB, error) {
@@ -75,6 +76,7 @@ func main() {
 		tempCache:      tempCache,
 		formDecoder:    formDecoder,
 		sessionManager: sessionManager,
+		users:          &model.UserModel{DB: db},
 	}
 
 	srv := &http.Server{

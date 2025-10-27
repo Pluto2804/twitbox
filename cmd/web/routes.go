@@ -17,11 +17,19 @@ func (app *application) routeMux() http.Handler {
 	router.Handler(http.MethodGet, "/static/*filepath", http.StripPrefix("/static", fileServer))
 
 	dynamic := alice.New(app.sessionManager.LoadAndSave)
+	protected := dynamic.Append(app.requireAuthentication)
 	//handlers
 	router.Handler(http.MethodGet, "/", dynamic.ThenFunc(app.home))
-	router.Handler(http.MethodPost, "/twit/create", dynamic.ThenFunc(app.twitCreatePost))
+	router.Handler(http.MethodPost, "/twit/create", protected.ThenFunc(app.twitCreatePost))
 	router.Handler(http.MethodGet, "/twit/view/:id", dynamic.ThenFunc(app.twitView))
-	router.Handler(http.MethodGet, "/twit/create", dynamic.ThenFunc(app.twitCreate))
+	router.Handler(http.MethodGet, "/twit/create", protected.ThenFunc(app.twitCreate))
+
+	//authentication and registration handlers
+	router.Handler(http.MethodGet, "/user/signup", dynamic.ThenFunc(app.userSignup))
+	router.Handler(http.MethodPost, "/user/signup", dynamic.ThenFunc(app.userSignupPost))
+	router.Handler(http.MethodGet, "/user/login", dynamic.ThenFunc(app.userLogin))
+	router.Handler(http.MethodPost, "/user/login", dynamic.ThenFunc(app.userLoginPost))
+	router.Handler(http.MethodPost, "/user/logout", protected.ThenFunc(app.userLogOut))
 
 	//chaining of middleware
 	standard := alice.New(app.recoverPanic, app.logRequest, secureHeaders)

@@ -13,11 +13,12 @@ var functions = template.FuncMap{
 }
 
 type templateData struct {
-	CurrentYear int
-	Twit        *model.Twit
-	Twits       []*model.Twit
-	Form        any
-	Flash       string
+	CurrentYear     int
+	Twit            *model.Twit
+	Twits           []*model.Twit
+	Form            any
+	Flash           string
+	IsAuthenticated bool
 }
 
 func newTemplateCache() (map[string]*template.Template, error) {

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/julienschmidt/httprouter"
 	"twitbox.vedantkugaonkar.net/internal/model"
@@ -55,7 +56,9 @@ func (app *application) twitView(w http.ResponseWriter, req *http.Request) {
 
 }
 func (app *application) twitCreate(w http.ResponseWriter, req *http.Request) {
-	data := &templateData{}
+	data := &templateData{
+		CurrentYear: time.Now().Year(),
+	}
 	data.Form = &snippetCreateForm{
 		Expires: 365,
 	}
@@ -80,11 +83,6 @@ func (app *application) twitCreatePost(w http.ResponseWriter, req *http.Request)
 		app.renderer(w, "create.tmpl.html", http.StatusUnprocessableEntity, data)
 		return
 	}
-
-	if err != nil {
-		app.clientError(w, http.StatusBadRequest)
-		return
-	}
 	id, err := app.twits.Insert(scF.Title, scF.Content, scF.Expires)
 	if err != nil {
 		app.serverError(w, err)
@@ -93,4 +91,110 @@ func (app *application) twitCreatePost(w http.ResponseWriter, req *http.Request)
 	app.sessionManager.Put(req.Context(), "flash", "Snippet successfully created!")
 	//redirecting user to the relevant page for the twit
 	http.Redirect(w, req, fmt.Sprintf("/twit/view/%d", id), http.StatusSeeOther)
+}
+
+type userCreateForm struct {
+	Name                string `form:"name"`
+	Email               string `form:"email"`
+	Password            string `form:"password"`
+	validator.Validator `form:"-"`
+}
+
+func (app *application) userSignup(w http.ResponseWriter, req *http.Request) {
+	data := app.newTemplateData(req)
+	data.Form = userCreateForm{}
+	app.renderer(w, "signup.tmpl.html", http.StatusCreated, data)
+}
+func (app *application) userSignupPost(w http.ResponseWriter, req *http.Request) {
+	var uCF userCreateForm
+	err := app.decodePostForm(req, &uCF)
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+	uCF.CheckField(validator.NotBlank(uCF.Name), "name", "This field cannot be blank!")
+	uCF.CheckField(validator.NotBlank(uCF.Email), "email", "This field cannot be empty!")
+	uCF.CheckField(validator.Matches(uCF.Email, validator.EmailRX), "email", "This field must be a valid email id")
+	uCF.CheckField(validator.NotBlank(uCF.Password), "password", "This field cannot be empty!")
+	uCF.CheckField(validator.MinChars(uCF.Password, 8), "password", "This field must be atleast 8 characters long!")
+	if !uCF.Valid() {
+		data := app.newTemplateData(req)
+		data.Form = uCF
+		app.renderer(w, "signup.tmpl.html", http.StatusUnprocessableEntity, data)
+		return
+	}
+	err = app.users.Insert(uCF.Name, uCF.Email, uCF.Password)
+	if err != nil {
+		if errors.Is(err, model.ErrDuplicateEmail) {
+			uCF.AddFieldErrors("email", "Email address already in use!")
+			data := app.newTemplateData(req)
+			data.Form = uCF
+			app.renderer(w, "signup.tmpl.html", http.StatusUnprocessableEntity, data)
+		} else {
+			app.serverError(w, err)
+		}
+		return
+	}
+	app.sessionManager.Put(req.Context(), "flash", "Your signup was successful.Please log in")
+	http.Redirect(w, req, "/user/login", http.StatusSeeOther)
+}
+
+type UserLoginForm struct {
+	Email    string `form:"email"`
+	Password string `form:"password"`
+	validator.Validator
+}
+
+func (app *application) userLogin(w http.ResponseWriter, req *http.Request) {
+	data := app.newTemplateData(req)
+	data.Form = UserLoginForm{}
+	app.renderer(w, "login.tmpl.html", http.StatusOK, data)
+}
+func (app *application) userLoginPost(w http.ResponseWriter, req *http.Request) {
+	var uLF UserLoginForm
+	err := app.decodePostForm(req, &uLF)
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+	uLF.CheckField(validator.NotBlank(uLF.Email), "email", "This field cannot be blank!")
+	uLF.CheckField(validator.Matches(uLF.Email, validator.EmailRX), "email", "This field must be a valid email address")
+	uLF.CheckField(validator.NotBlank(uLF.Password), "password", "This field cannot be blank!")
+	if !uLF.Valid() {
+		data := app.newTemplateData(req)
+		data.Form = uLF
+		app.renderer(w, "login.tmpl.html", http.StatusUnprocessableEntity, data)
+		return
+	}
+	id, err := app.users.Authenticate(uLF.Email, uLF.Password)
+	if err != nil {
+		if errors.Is(err, model.ErrInvalidCredentials) {
+			uLF.AddNonFieldError("Email or password is incorrect!")
+			data := app.newTemplateData(req)
+			data.Form = uLF
+			app.renderer(w, "login.tmpl.html", http.StatusUnprocessableEntity, data)
+		} else {
+			app.serverError(w, err)
+		}
+		return
+	}
+	err = app.sessionManager.RenewToken(req.Context())
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	app.sessionManager.Put(req.Context(), "authenticatedUserId", id)
+	http.Redirect(w, req, "/twit/create", http.StatusSeeOther)
+
+}
+func (app *application) userLogOut(w http.ResponseWriter, req *http.Request) {
+	err := app.sessionManager.RenewToken(req.Context())
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	app.sessionManager.Remove(req.Context(), "authenticatedUserId")
+	app.sessionManager.Put(req.Context(), "flash", "You've been logged out successfully!")
+	http.Redirect(w, req, "/", http.StatusSeeOther)
+
 }

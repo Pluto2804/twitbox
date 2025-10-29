@@ -19,6 +19,7 @@ type templateData struct {
 	Form            any
 	Flash           string
 	IsAuthenticated bool
+	CSRFToken       string
 }
 
 func newTemplateCache() (map[string]*template.Template, error) {
@@ -36,7 +37,7 @@ func newTemplateCache() (map[string]*template.Template, error) {
 		if err != nil {
 			return nil, err
 		}
-		ts, err = ts.ParseGlob("ui/html/partials*.tmpl.html")
+		ts, err = ts.ParseGlob("ui/html/partials/*.tmpl.html")
 		if err != nil {
 			return nil, err
 		}

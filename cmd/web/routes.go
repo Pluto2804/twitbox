@@ -35,6 +35,7 @@ func (app *application) routes() http.Handler {
 
     // public
     router.Handler(http.MethodGet, "/", dynamic.ThenFunc(app.home))
+    router.Handler(http.MethodGet, "/about", dynamic.ThenFunc(app.about))
     router.Handler(http.MethodGet, "/twit/view/:id", dynamic.ThenFunc(app.twitView))
     router.Handler(http.MethodGet, "/user/signup", dynamic.ThenFunc(app.userSignup))
     router.Handler(http.MethodPost, "/user/signup", dynamic.ThenFunc(app.userSignupPost))

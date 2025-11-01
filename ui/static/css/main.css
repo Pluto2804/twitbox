@@ -311,3 +311,14 @@ footer {
     color: #6A6C6F;
     text-align: center;
 }
+/* Fix long text overflow in Twit content */
+.snippet pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+.twit-content {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}

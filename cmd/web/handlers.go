@@ -202,3 +202,8 @@ func (app *application) userLogOut(w http.ResponseWriter, req *http.Request) {
 	http.Redirect(w, req, "/", http.StatusSeeOther)
 
 }
+func (app *application) about(w http.ResponseWriter, req *http.Request) {
+	data := app.newTemplateData(req)
+	app.renderer(w, req, "about.tmpl.html", http.StatusOK, data)
+}
+

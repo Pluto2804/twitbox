@@ -1,0 +1,38 @@
+name: Deploy to Digital Ocean
+
+on:
+  push:
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Deploy to Digital Ocean
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.DEPLOY_HOST }}
+        username: ${{ secrets.DEPLOY_USER }}
+        key: ${{ secrets.DEPLOY_KEY }}
+        script: |
+          cd ${{ secrets.DEPLOY_PATH }}
+          
+          echo "📥 Pulling latest changes from GitHub..."
+          git pull origin master
+          
+          echo "🔨 Building application..."
+          go build -o bin/linux_amd64/web ./cmd/web
+          
+          if [ $? -eq 0 ]; then
+            echo "🔄 Restarting service..."
+            sudo systemctl restart twitbox.service
+            echo "✅ Deployment successful!"
+          else
+            echo "❌ Build failed! Not restarting service."
+            exit 1
+          fi

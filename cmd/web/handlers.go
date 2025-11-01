@@ -27,7 +27,7 @@ func (app *application) home(w http.ResponseWriter, req *http.Request) {
 	}
 	data := app.newTemplateData(req)
 	data.Twits = twits
-	app.renderer(w, "home.tmpl.html", http.StatusOK, data)
+	app.renderer(w,req, "home.tmpl.html", http.StatusOK, data)
 }
 func (app *application) twitView(w http.ResponseWriter, req *http.Request) {
 	//when httprouter parses a req, any named parameters are stored in the
@@ -52,26 +52,29 @@ func (app *application) twitView(w http.ResponseWriter, req *http.Request) {
 	data := app.newTemplateData(req)
 	data.Twit = twit
 
-	app.renderer(w, "view.tmpl.html", http.StatusOK, data)
+	app.renderer(w,req, "view.tmpl.html", http.StatusOK, data)
 
 }
 func (app *application) twitCreate(w http.ResponseWriter, req *http.Request) {
-	data := &templateData{
-		CurrentYear: time.Now().Year(),
-	}
+	data := app.newTemplateData(req)
+        data.CurrentYear = time.Now().Year()
 	data.Form = &snippetCreateForm{
 		Expires: 365,
 	}
-	app.renderer(w, "create.tmpl.html", http.StatusCreated, data)
+	app.renderer(w,req, "create.tmpl.html", http.StatusCreated, data)
 
 }
 func (app *application) twitCreatePost(w http.ResponseWriter, req *http.Request) {
+        app.infoLog.Printf("POST /twit/create - Content-Type: %s", req.Header.Get("Content-Type"))
+	app.infoLog.Printf("POST /twit/create - Form values before decode: %v", req.PostForm)
 	var scF snippetCreateForm
 	err := app.decodePostForm(req, &scF)
 	if err != nil {
+                app.errorLog.Printf("Form decode error: %v", err)
 		app.clientError(w, http.StatusBadRequest)
 		return
 	}
+        app.infoLog.Printf("POST /twit/create - Decoded form: Title=%s, Content=%s, Expires=%d", scF.Title, scF.Content, scF.Expires)
 
 	scF.CheckField(validator.NotBlank(scF.Title), "title", "This field cannot be blank!")
 	scF.CheckField(validator.MaxChars(scF.Title, 100), "title", "This field cannot be more than 100 characters")
@@ -80,11 +83,12 @@ func (app *application) twitCreatePost(w http.ResponseWriter, req *http.Request)
 	if !scF.Valid() {
 		data := app.newTemplateData(req)
 		data.Form = scF
-		app.renderer(w, "create.tmpl.html", http.StatusUnprocessableEntity, data)
+		app.renderer(w,req, "create.tmpl.html", http.StatusUnprocessableEntity, data)
 		return
 	}
 	id, err := app.twits.Insert(scF.Title, scF.Content, scF.Expires)
 	if err != nil {
+                
 		app.serverError(w, err)
 		return
 	}
@@ -103,7 +107,7 @@ type userCreateForm struct {
 func (app *application) userSignup(w http.ResponseWriter, req *http.Request) {
 	data := app.newTemplateData(req)
 	data.Form = userCreateForm{}
-	app.renderer(w, "signup.tmpl.html", http.StatusCreated, data)
+	app.renderer(w,req, "signup.tmpl.html", http.StatusCreated, data)
 }
 func (app *application) userSignupPost(w http.ResponseWriter, req *http.Request) {
 	var uCF userCreateForm
@@ -120,7 +124,7 @@ func (app *application) userSignupPost(w http.ResponseWriter, req *http.Request)
 	if !uCF.Valid() {
 		data := app.newTemplateData(req)
 		data.Form = uCF
-		app.renderer(w, "signup.tmpl.html", http.StatusUnprocessableEntity, data)
+		app.renderer(w,req, "signup.tmpl.html", http.StatusUnprocessableEntity, data)
 		return
 	}
 	err = app.users.Insert(uCF.Name, uCF.Email, uCF.Password)
@@ -129,7 +133,7 @@ func (app *application) userSignupPost(w http.ResponseWriter, req *http.Request)
 			uCF.AddFieldErrors("email", "Email address already in use!")
 			data := app.newTemplateData(req)
 			data.Form = uCF
-			app.renderer(w, "signup.tmpl.html", http.StatusUnprocessableEntity, data)
+			app.renderer(w,req, "signup.tmpl.html", http.StatusUnprocessableEntity, data)
 		} else {
 			app.serverError(w, err)
 		}
@@ -148,7 +152,7 @@ type UserLoginForm struct {
 func (app *application) userLogin(w http.ResponseWriter, req *http.Request) {
 	data := app.newTemplateData(req)
 	data.Form = UserLoginForm{}
-	app.renderer(w, "login.tmpl.html", http.StatusOK, data)
+	app.renderer(w,req, "login.tmpl.html", http.StatusOK, data)
 }
 func (app *application) userLoginPost(w http.ResponseWriter, req *http.Request) {
 	var uLF UserLoginForm
@@ -163,7 +167,7 @@ func (app *application) userLoginPost(w http.ResponseWriter, req *http.Request) 
 	if !uLF.Valid() {
 		data := app.newTemplateData(req)
 		data.Form = uLF
-		app.renderer(w, "login.tmpl.html", http.StatusUnprocessableEntity, data)
+		app.renderer(w,req, "login.tmpl.html", http.StatusUnprocessableEntity, data)
 		return
 	}
 	id, err := app.users.Authenticate(uLF.Email, uLF.Password)
@@ -172,7 +176,7 @@ func (app *application) userLoginPost(w http.ResponseWriter, req *http.Request) 
 			uLF.AddNonFieldError("Email or password is incorrect!")
 			data := app.newTemplateData(req)
 			data.Form = uLF
-			app.renderer(w, "login.tmpl.html", http.StatusUnprocessableEntity, data)
+			app.renderer(w,req, "login.tmpl.html", http.StatusUnprocessableEntity, data)
 		} else {
 			app.serverError(w, err)
 		}

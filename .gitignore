@@ -1,1 +1,19 @@
 tls/
+bin/
+
+# Binaries
+bin/
+.bin/
+web
+
+# Environment files
+.env
+*.env
+
+# OS files
+.DS_Store
+*.swp
+
+# Database
+*.db
+

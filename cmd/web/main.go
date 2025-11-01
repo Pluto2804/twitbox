@@ -1,7 +1,7 @@
 package main
 
 import (
-	"crypto/tls"
+
 	"database/sql"
 	"flag"
 	"log"
@@ -42,8 +42,14 @@ func main() {
 	addr := flag.String("addr", ":4000", "HTTP network address")
 	// dsn=data source name,contains all the info req for establishing a connection
 	//to the database.Just a string with all info for the driver
-	dsn := flag.String("dsn", "frido:rama@2804@/twitbox?parseTime=true", "MySQL data source name")
+	dsn := flag.String("dsn", os.Getenv("TWITBOX_DB_DSN"), "MySQL data source name")
 	flag.Parse()
+
+	if *dsn == "" {
+		// fallback for local development
+		*dsn = "twitbox:rama2804@tcp(localhost:3306)/twitbox?parseTime=true&multiStatements=true"
+
+	}
 
 	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
 	errorLog := log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
@@ -64,10 +70,13 @@ func main() {
 	sessionManager.Store = mysqlstore.New(db)
 	sessionManager.Lifetime = 12 * time.Hour
 	sessionManager.Cookie.Secure = true
+        sessionManager.Cookie.HttpOnly = true
+        sessionManager.Cookie.SameSite = http.SameSiteLaxMode
+        sessionManager.Cookie.Path = "/"
+        sessionManager.Cookie.Name = "session"
+        //sessionManager.Cookie.Domain = "twitbox.app"
 
-	tlsConfig := &tls.Config{
-		CurvePreferences: []tls.CurveID{tls.X25519, tls.CurveP256},
-	}
+	
 
 	ap := &application{
 		errorLog:       errorLog,
@@ -82,16 +91,16 @@ func main() {
 	srv := &http.Server{
 		Addr:     *addr,
 		ErrorLog: errorLog,
-		//calling the ap.routeMux() to get the servemux containing our routes
-		Handler:      ap.routeMux(),
-		TLSConfig:    tlsConfig,
+		//calling the ap.routes() to get the servemux containing our routes
+		Handler:      ap.routes(),
 		IdleTimeout:  time.Minute,
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
 	}
 
 	infoLog.Printf("Starting a server on %s", *addr)
-	err = srv.ListenAndServeTLS("tls/cert.pem", "tls/key.pem")
+	err = srv.ListenAndServe()
+
 	errorLog.Fatal(err)
 
 }

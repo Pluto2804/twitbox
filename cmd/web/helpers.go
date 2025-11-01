@@ -30,7 +30,7 @@ func (app *application) clientError(w http.ResponseWriter, status int) {
 func (app *application) notFound(w http.ResponseWriter) {
 	app.clientError(w, http.StatusNotFound)
 }
-func (app *application) renderer(w http.ResponseWriter, page string, status int, data *templateData) {
+func (app *application) renderer(w http.ResponseWriter,req *http.Request, page string, status int, data *templateData) {
 	ts, ok := app.tempCache[page]
 	if !ok {
 		err := fmt.Errorf("template for %s not available", page)
@@ -38,7 +38,7 @@ func (app *application) renderer(w http.ResponseWriter, page string, status int,
 		return
 	}
 	if data == nil {
-		data = app.newTemplateData(nil)
+		data = app.newTemplateData(req)
 	}
 	buf := new(bytes.Buffer)
 	err := ts.ExecuteTemplate(buf, "base", data)

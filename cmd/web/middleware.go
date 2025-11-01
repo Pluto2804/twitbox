@@ -30,7 +30,18 @@ func secureHeaders(next http.Handler) http.Handler {
 func (app *application) logRequest(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		app.infoLog.Printf("%s - %s %s %s", req.RemoteAddr, req.Proto, req.Method, req.URL.RequestURI())
+		
+		// Add this for POST requests
+		if req.Method == "POST" {
+			app.infoLog.Printf("DEBUG: POST request to %s reached logRequest middleware", req.URL.Path)
+		}
+		
 		next.ServeHTTP(w, req)
+		
+		// Add this after the handler completes
+		if req.Method == "POST" {
+			app.infoLog.Printf("DEBUG: POST request to %s completed in logRequest middleware", req.URL.Path)
+		}
 	})
 }
 func (app *application) recoverPanic(next http.Handler) http.Handler {
@@ -61,10 +72,20 @@ func noSurf(next http.Handler) http.Handler {
 		HttpOnly: true,
 		Path:     "/",
 		Secure:   true,
+		SameSite: http.SameSiteLaxMode,
 	})
+	
+	// Add failure handler to see CSRF errors
+	csrfHandler.SetFailureHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Printf("CSRF validation failed! Reason: %s\n", nosurf.Reason(r))
+		http.Error(w, "CSRF token validation failed: "+nosurf.Reason(r).Error(), http.StatusBadRequest)
+	}))
+	
 	return csrfHandler
-
 }
+
+
+
 func (app *application) authenticate(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		id := app.sessionManager.GetInt(req.Context(), "authenticatedUserId")

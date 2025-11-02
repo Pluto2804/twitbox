@@ -207,7 +207,7 @@ func (app *application) about(w http.ResponseWriter, req *http.Request) {
 	app.renderer(w, req, "about.tmpl.html", http.StatusOK, data)
 }
 func (app *application) accountView(w http.ResponseWriter, req *http.Request) {
-	userID := app.sessionManager.GetInt(req.Context(), "authenticatedUserID")
+	userID := app.sessionManager.GetInt(req.Context(), "authenticatedUserId")
 
 	user, err := app.users.Get(userID)
 	if err != nil {

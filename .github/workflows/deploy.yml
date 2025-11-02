@@ -8,12 +8,9 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-    
-    - name: Deploy to Digital Ocean
+    - name: ⬇️ Deploy via SSH
       uses: appleboy/ssh-action@v1.0.3
       with:
         host: ${{ secrets.DEPLOY_HOST }}
@@ -24,17 +21,18 @@ jobs:
         script: |
           set -e
           cd ${{ secrets.DEPLOY_PATH }}
-          
+
           echo "📥 Pulling latest changes..."
-          git pull origin master
-          
-          echo "🔨 Building application..."
-          go build -o bin/linux_amd64/web ./cmd/web
-          
+          git fetch --all
+          git reset --hard origin/master
+
+          echo "🔨 Building Go binary..."
+          /usr/local/go/bin/go build -o bin/linux_amd64/web ./cmd/web
+
           echo "🔄 Restarting service..."
           sudo systemctl restart twitbox.service
-          
+
           echo "✅ Deployment successful!"
-          
-          echo "🔍 Checking service status..."
           sudo systemctl status twitbox.service --no-pager | head -10
+
+        

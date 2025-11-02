@@ -46,6 +46,7 @@ func (app *application) routes() http.Handler {
     router.Handler(http.MethodGet, "/twit/create", protected.ThenFunc(app.twitCreate))
     router.Handler(http.MethodPost, "/twit/create", protected.ThenFunc(app.twitCreatePost))
     router.Handler(http.MethodPost, "/user/logout", protected.ThenFunc(app.userLogOut))
+	router.Handler(http.MethodGet,"/user/account",protected.ThenFunc(app.accountView))
 
     return dynamic.Then(router) // ✅ not standard.Then
 }

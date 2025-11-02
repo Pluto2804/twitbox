@@ -20,6 +20,7 @@ type templateData struct {
 	Flash           string
 	IsAuthenticated bool
 	CSRFToken       string
+	user            *model.User
 }
 
 func newTemplateCache() (map[string]*template.Template, error) {

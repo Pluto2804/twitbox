@@ -219,9 +219,9 @@ func (app *application) accountView(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := app.newTemplateData(r)
+	data := app.newTemplateData(req)
 	data.User = user
 
-	app.render(w, http.StatusOK, "account.tmpl", data)
+	app.render(w, req , "account.tmpl.html",http.StatusOK, data)
 }
 

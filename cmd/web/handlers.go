@@ -206,13 +206,13 @@ func (app *application) about(w http.ResponseWriter, req *http.Request) {
 	data := app.newTemplateData(req)
 	app.renderer(w, req, "about.tmpl.html", http.StatusOK, data)
 }
-func (app *application) accountView(w http.ResponseWriter, r *http.Request) {
-	userID := app.sessionManager.GetInt(r.Context(), "authenticatedUserID")
+func (app *application) accountView(w http.ResponseWriter, req *http.Request) {
+	userID := app.sessionManager.GetInt(req.Context(), "authenticatedUserID")
 
 	user, err := app.users.Get(userID)
 	if err != nil {
-		if errors.Is(err, models.ErrNoRecord) {
-			http.Redirect(w, r, "/user/login", http.StatusSeeOther)
+		if errors.Is(err, model.ErrNoRecord) {
+			http.Redirect(w, req, "/user/login", http.StatusSeeOther)
 		} else {
 			app.serverError(w, err)
 		}
@@ -222,6 +222,6 @@ func (app *application) accountView(w http.ResponseWriter, r *http.Request) {
 	data := app.newTemplateData(req)
 	data.User = user
 
-	app.render(w, req , "account.tmpl.html",http.StatusOK, data)
+	app.renderer(w, req , "account.tmpl.html",http.StatusOK, data)
 }
 

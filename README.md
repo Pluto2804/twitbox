@@ -1,4 +1,4 @@
-TwitBox
+# 🐦 Twitbox – A Go Web Application
 Welcome to Twitbox, a modern micro-social platform built for creators, thinkers, and storytellers. 
 We are focused on providing a simple and meaningful space that values authenticity and expression. 
 Our platform is engineered for lightning-fast performance using Go and is secure by design, featuring robust session authentication, CSRF protection, and a privacy-first architecture. 
@@ -6,19 +6,12 @@ It demonstrates clean architecture, secure authentication, and efficient session
 
 
 
-User Authentication & Authorization: Secure user registration and login system
-Session Management: HTTP-only cookie-based sessions with CSRF protection
-Twit Management: Create, view, and manage short messages
-Template Caching: Efficient HTML template rendering with in-memory caching
-Middleware Chain: Composable middleware for logging, recovery, authentication, and CSRF protection
-Database Migrations: Version-controlled database schema management
-
-h<img width="1512" height="982" alt="Screenshot 2025-11-12 at 9 41 57 AM" src="https://github.com/user-attachments/assets/cf40371d-aea3-4a12-a992-bbc88b7e29ab" />
-ttps://github.com/user-attachments/assets/1a000400-972a-4e76-98ad-47cf9b53843c
-<img width="1512" height="982" alt="Screenshot 2025-11-12 at 9 42 53 AM" src="https://github.com/user-attachments/assets/d5477c7d-afcc-403e-8f77-9647afc4327f" />
-<img width="1512" height="982" alt="Screenshot 2025-11-12 at 9 52 44 AM" src="https://github.com/user-attachments/assets/d54e8f0d-a8e5-41b6-b358-437c7f20620f" /><img width="1512" height="982" alt="Screenshot 2025-11-12 at 10 03 02 AM" src="https://github.com/user-attachments/assets/b072add6-6ec6-46f9-ad8b-42f0c1c3422b" />
-
-
+- 🔐  User Authentication & Authorization: Secure user registration and login system
+- ⚙️  Session Management: HTTP-only cookie-based sessions with CSRF protection
+- 🧠  Twit Management: Create, view, and manage short messages
+- 🧩  Template Caching: Efficient HTML template rendering with in-memory caching
+- 🧱  Middleware Chain: Composable middleware for logging, recovery, authentication, and CSRF protection
+- 🗄️  Database Migrations: Version-controlled database schema management
 
 Production Deployment: Deployed on DigitalOcean with systemd service management
 
@@ -94,7 +87,7 @@ twitbox/
 ├── go.sum                   # Dependency checksums
 ├── Makefile                 # Build and deployment automation
 └── LICENSE                  # Project license
-
+```
 
 Technology Stack
 
@@ -110,3 +103,15 @@ Prerequisites
 Go 1.21 or higher
 MySQL 8.0 or higher
 Make (for using Makefile commands)
+
+Demo Video:
+https://github.com/user-attachments/assets/1a000400-972a-4e76-98ad-47cf9b53843c
+
+
+<img width="1512" height="982" alt="Screenshot 2025-11-12 at 9 41 57 AM" src="https://github.com/user-attachments/assets/cf40371d-aea3-4a12-a992-bbc88b7e29ab" />
+<img width="1512" height="982" alt="Screenshot 2025-11-12 at 9 42 53 AM" src="https://github.com/user-attachments/assets/d5477c7d-afcc-403e-8f77-9647afc4327f" />
+<img width="1512" height="982" alt="Screenshot 2025-11-12 at 9 52 44 AM" src="https://github.com/user-attachments/assets/d54e8f0d-a8e5-41b6-b358-437c7f20620f" />
+<img width="1512" height="982" alt="Screenshot 2025-11-12 at 10 03 02 AM" src="https://github.com/user-attachments/assets/b072add6-6ec6-46f9-ad8b-42f0c1c3422b" />
+
+🔗 **Live App:** 
+[https://twitbox.app](https://twitbox.app) 

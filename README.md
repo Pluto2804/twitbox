@@ -13,7 +13,11 @@ Template Caching: Efficient HTML template rendering with in-memory caching
 Middleware Chain: Composable middleware for logging, recovery, authentication, and CSRF protection
 Database Migrations: Version-controlled database schema management
 
-https://github.com/user-attachments/assets/1a000400-972a-4e76-98ad-47cf9b53843c
+h<img width="1512" height="982" alt="Screenshot 2025-11-12 at 9 41 57 AM" src="https://github.com/user-attachments/assets/cf40371d-aea3-4a12-a992-bbc88b7e29ab" />
+ttps://github.com/user-attachments/assets/1a000400-972a-4e76-98ad-47cf9b53843c
+<img width="1512" height="982" alt="Screenshot 2025-11-12 at 9 42 53 AM" src="https://github.com/user-attachments/assets/d5477c7d-afcc-403e-8f77-9647afc4327f" />
+<img width="1512" height="982" alt="Screenshot 2025-11-12 at 9 52 44 AM" src="https://github.com/user-attachments/assets/d54e8f0d-a8e5-41b6-b358-437c7f20620f" /><img width="1512" height="982" alt="Screenshot 2025-11-12 at 10 03 02 AM" src="https://github.com/user-attachments/assets/b072add6-6ec6-46f9-ad8b-42f0c1c3422b" />
+
 
 
 Production Deployment: Deployed on DigitalOcean with systemd service management
@@ -62,10 +66,7 @@ twitbox/
 │   │   │   ├── login.tmpl.html
 │   │   │   ├── signup.tmpl.html
 │   │   │   ├── account.tmpl.html
-│   │   │   <img width="1512" height="982" alt="Screenshot 2025-11-12 at 10 03 02 AM" src="https://github.com/user-attachments/assets/9bc44c7e-b05c-4c14-8f61-791496e0153a" />
-<img width="1512" height="982" alt="Screenshot 2025-11-12 at 9 52 44 AM" src="https://github.com/user-attachments/assets/d68c0db4-edb7-4c44-8107-a15a622c279d" />
-<img width="1512" height="982" alt="Screenshot 2025-11-12 at 9 42 53 AM" src="https://github.com/user-attachments/assets/befba7e2-c6c6-4bbb-b810-a203151bbfe6" />
-└── about.tmpl.html
+│   │   │  
 │   │   └── partials/        # Reusable components
 │   │       └── nav.tmpl.html
 │   └── static/              # Static assets

@@ -62,7 +62,10 @@ twitbox/
 │   │   │   ├── login.tmpl.html
 │   │   │   ├── signup.tmpl.html
 │   │   │   ├── account.tmpl.html
-│   │   │   └── about.tmpl.html
+│   │   │   <img width="1512" height="982" alt="Screenshot 2025-11-12 at 10 03 02 AM" src="https://github.com/user-attachments/assets/9bc44c7e-b05c-4c14-8f61-791496e0153a" />
+<img width="1512" height="982" alt="Screenshot 2025-11-12 at 9 52 44 AM" src="https://github.com/user-attachments/assets/d68c0db4-edb7-4c44-8107-a15a622c279d" />
+<img width="1512" height="982" alt="Screenshot 2025-11-12 at 9 42 53 AM" src="https://github.com/user-attachments/assets/befba7e2-c6c6-4bbb-b810-a203151bbfe6" />
+└── about.tmpl.html
 │   │   └── partials/        # Reusable components
 │   │       └── nav.tmpl.html
 │   └── static/              # Static assets

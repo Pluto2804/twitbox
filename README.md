@@ -87,7 +87,6 @@ twitbox/
 ├── go.sum                   # Dependency checksums
 ├── Makefile                 # Build and deployment automation
 └── LICENSE                  # Project license
-```
 
 Technology Stack
 
@@ -97,6 +96,8 @@ Web Server: Caddy (reverse proxy with automatic HTTPS)
 Session Store: Encrypted cookie-based sessions
 Deployment: DigitalOcean Droplet (Ubuntu)
 Process Management: systemd service
+```
+
 
 Prerequisites
 

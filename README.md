@@ -29,6 +29,10 @@ Polymorphism: Interface-based database access for testability
 Abstraction: Clean separation between data layer and business logic
 Encapsulation: Internal packages hide implementation details
 
+🔗 **Live App:** 
+[https://twitbox.app](https://twitbox.app) 
+
+
 Project Structure
 ```bash
 twitbox/
@@ -115,5 +119,3 @@ https://github.com/user-attachments/assets/1a000400-972a-4e76-98ad-47cf9b53843c
 <img width="1512" height="982" alt="Screenshot 2025-11-12 at 9 52 44 AM" src="https://github.com/user-attachments/assets/d54e8f0d-a8e5-41b6-b358-437c7f20620f" />
 <img width="1512" height="982" alt="Screenshot 2025-11-12 at 10 03 02 AM" src="https://github.com/user-attachments/assets/b072add6-6ec6-46f9-ad8b-42f0c1c3422b" />
 
-🔗 **Live App:** 
-[https://twitbox.app](https://twitbox.app) 

@@ -7,7 +7,7 @@ It demonstrates clean architecture, secure authentication, and efficient session
 
 
 - 🔐  User Authentication & Authorization: Secure user registration and login system
-- ⚙️  Session Management: HTTP-only cookie-based sessions with CSRF protection
+- ⚙️  Session Management: HTTPS-only cookie-based sessions with CSRF protection
 - 🧠  Twit Management: Create, view, and manage short messages
 - 🧩  Template Caching: Efficient HTML template rendering with in-memory caching
 - 🧱  Middleware Chain: Composable middleware for logging, recovery, authentication, and CSRF protection
